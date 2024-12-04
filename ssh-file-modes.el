@@ -31,12 +31,24 @@
 ;; SSH keys invisible so that the content of the files fits better on
 ;; the screen.  It is enabled by default, but it can be turned off by
 ;; running `(ssh-abbreviated-keys-mode 0)'.
+;; If needed change the default by setting `ssh-abbreviated-mode-default'
+;; user-option to nil.
 
 ;;; Code:
 
 (defgroup ssh-file nil
   "Modes for editing SSH files"
   :group 'tools)
+
+(defcustom ssh-abbreviated-mode-default t
+  "Whether `ssh-abbreviated-mode' is activated automatically.
+
+Affects the initial behaviour of `ssh-authorized-keys-mode' and
+`ssh-known-hosts-mode'.  If set to `t', the long keys are abbreviated
+automatically."
+  :group 'ssh-file
+  :type 'boolean
+  :safe #'booleanp)
 
 (defgroup ssh-file-faces nil
   "Faces for highlighting SSH files"
@@ -70,7 +82,7 @@
 
 (define-minor-mode ssh-abbreviated-keys-mode
   "Minor mode that hides parts of lengthy SSH keys."
-  :init-value t
+  :init-value nil
   (if ssh-abbreviated-keys-mode
       (progn
         (ssh-abbreviated-keys-overlay)
@@ -93,13 +105,17 @@
                     "no-X11-forwarding"
                     "permitopen"
                     "principals"
-                    "tunnel") 'words) . font-lock-keyword-face)
+                    "tunnel")
+                  'words)
+     . font-lock-keyword-face)
    `(,(regexp-opt '("ecdsa-sha2-nistp256"
                     "ecdsa-sha2-nistp384"
                     "ecdsa-sha2-nistp521"
                     "ssh-ed25519"
                     "ssh-dss"
-                    "ssh-rsa") 'words) . 'ssh-file-key-type-face)
+                    "ssh-rsa")
+                  'words)
+     . 'ssh-file-key-type-face)
    '("\\<AAAA\\(?:\\s_\\|\\w\\)+" . 'ssh-file-key-face)
    '("\\<AAAA\\(?:\\s_\\|\\w\\)+\\s-+\\(.+\\)$" . (1 font-lock-comment-face)) ;; trailing comment
    ))
@@ -128,7 +144,7 @@
         comment-end "")
   (setq font-lock-defaults '(ssh-authorized-keys-mode-font-lock-keywords nil t))
   (setq truncate-lines t)
-  (ssh-abbreviated-keys-mode (symbol-value 'ssh-abbreviated-keys-mode))
+  (ssh-abbreviated-keys-mode (if ssh-abbreviated-mode-default 1 -1))
   (run-hooks 'ssh-authorized-keys-mode-hook))
 
 ;;;###autoload
@@ -175,7 +191,7 @@
         comment-end "")
   (setq font-lock-defaults '(ssh-known-hosts-mode-font-lock-keywords))
   (setq truncate-lines t)
-  (ssh-abbreviated-keys-mode (symbol-value 'ssh-abbreviated-keys-mode))
+  (ssh-abbreviated-keys-mode (if ssh-abbreviated-mode-default 1 -1))
   (run-hooks 'ssh-known-hosts-mode-hook))
 
 ;;;###autoload
