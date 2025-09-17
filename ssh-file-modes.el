@@ -7,6 +7,11 @@
 ;; Version: 0
 ;; Keywords: languages
 
+;; Modifications: by Pierre Rouleau <prouleau001@gmail.com>
+;; - using lexical binding
+;; - add `ssh-abbreviated-mode-default' user-option
+;; - `ssh-file-faces' is a child of `ssh-file' group.
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2 of the License, or
@@ -52,8 +57,7 @@ automatically."
 
 (defgroup ssh-file-faces nil
   "Faces for highlighting SSH files"
-  :prefix "ssh-file-"
-  :group 'ssh-file-
+  :group 'ssh-file
   :group 'faces)
 
 (defface ssh-file-hashed-hostname-face
