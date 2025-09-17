@@ -79,7 +79,10 @@ automatically."
   "Create overlay for making part of key invisible."
   (save-excursion
     (goto-char 1)
-    (while (re-search-forward  "\\<AAAA\\(?:\\s_\\|\\w\\)\\{8\\}\\(\\(?:\\s_\\|\\w\\)+\\)\\(?:\\s_\\|\\w\\)\\{8\\}" nil t)
+    (while
+        (re-search-forward
+         "\\<AAAA\\(?:\\s_\\|\\w\\)\\{8\\}\\(\\(?:\\s_\\|\\w\\)+\\)\\(?:\\s_\\|\\w\\)\\{8\\}"
+         nil t)
       (let ((ov (make-overlay (match-beginning 1) (match-end 1))))
         (overlay-put ov 'evaporate t)
         (overlay-put ov 'invisible 'ssh-file-key)))))
@@ -121,7 +124,8 @@ automatically."
                   'words)
      . 'ssh-file-key-type-face)
    '("\\<AAAA\\(?:\\s_\\|\\w\\)+" . 'ssh-file-key-face)
-   '("\\<AAAA\\(?:\\s_\\|\\w\\)+\\s-+\\(.+\\)$" . (1 font-lock-comment-face)) ;; trailing comment
+   ;; trailing comment
+   '("\\<AAAA\\(?:\\s_\\|\\w\\)+\\s-+\\(.+\\)$" . (1 font-lock-comment-face))
    ))
 
 (defvar ssh-authorized-keys-mode-syntax-table
@@ -146,13 +150,15 @@ automatically."
   (set-syntax-table ssh-authorized-keys-mode-syntax-table)
   (setq comment-start "#"
         comment-end "")
-  (setq font-lock-defaults '(ssh-authorized-keys-mode-font-lock-keywords nil t))
+  (setq font-lock-defaults
+        '(ssh-authorized-keys-mode-font-lock-keywords nil t))
   (setq truncate-lines t)
   (ssh-abbreviated-keys-mode (if ssh-abbreviated-mode-default 1 -1))
   (run-hooks 'ssh-authorized-keys-mode-hook))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '(".ssh/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+(add-to-list 'auto-mode-alist
+             '(".ssh/authorized_keys2?\\'" . ssh-authorized-keys-mode))
 
 (defvar ssh-known-hosts-mode-hook nil
   "*Hook to setup `ssh-known-hosts-mode'.")
@@ -163,9 +169,13 @@ automatically."
    `(,(regexp-opt '("@revoked") 'words) . font-lock-warning-face)
    `(,(regexp-opt '("!")) . font-lock-negation-char-face)
    '("|\\S-+" . 'ssh-file-hashed-hostname-face)
-   '("^\\(?:\\s-*@[a-z-]+\\)?\\s-*\\S-+\\s-+\\(\\S-+\\)" . (1 'ssh-file-key-type-face))
-   '("^\\(?:\\s-*@[a-z-]+\\)?\\s-*\\S-+\\s-+\\S-+\\s-+\\(\\(?:\\s_\\|\\w\\)+\\)" . (1 'ssh-file-key-face))
-   '("^\\(?:\\s-*@[a-z-]+\\)?\\s-*\\S-+\\s-+\\S-+\\s-+\\(?:\\s_\\|\\w\\)+\\s-+\\(.+\\)$" . (1 font-lock-comment-face)))) ;; trailing comment
+   '("^\\(?:\\s-*@[a-z-]+\\)?\\s-*\\S-+\\s-+\\(\\S-+\\)"
+     . (1 'ssh-file-key-type-face))
+   '("^\\(?:\\s-*@[a-z-]+\\)?\\s-*\\S-+\\s-+\\S-+\\s-+\\(\\(?:\\s_\\|\\w\\)+\\)"
+     . (1 'ssh-file-key-face))
+   ;; trailing comment
+   '("^\\(?:\\s-*@[a-z-]+\\)?\\s-*\\S-+\\s-+\\S-+\\s-+\\(?:\\s_\\|\\w\\)+\\s-+\\(.+\\)$"
+     . (1 font-lock-comment-face))))
 
 (defvar ssh-known-hosts-mode-syntax-table
   (let ((table (make-syntax-table)))
