@@ -1,4 +1,4 @@
-;;; ssh-file-modes.el --- major modes for ssh authorized_keys and known_hosts files
+;;; ssh-file-modes.el --- major modes for ssh files -*-lexical-binding: t-*-
 
 ;; Copyright (C) 2015 Peter Eisentraut
 
