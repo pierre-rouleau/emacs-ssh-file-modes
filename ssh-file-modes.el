@@ -11,6 +11,8 @@
 ;; - using lexical binding
 ;; - add `ssh-abbreviated-mode-default' user-option
 ;; - `ssh-file-faces' is a child of `ssh-file' group.
+;; - modernize code: use `define-derived-mode' to define major modes
+;;   instead of `defun'
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -99,7 +101,7 @@ automatically."
 (defvar ssh-authorized-keys-mode-hook nil
   "*Hook to setup `ssh-authorized-keys-mode'.")
 
-(defvar ssh-authorized-keys-mode-font-lock-keywords
+(defconst ssh-authorized-keys-mode-font-lock-keywords
   (list
    `(,(regexp-opt '("cert-authority"
                     "command"
@@ -141,17 +143,17 @@ automatically."
   "Syntax table used by `ssh-authorized-keys-mode'.")
 
 ;;;###autoload
-(defun ssh-authorized-keys-mode ()
+(define-derived-mode ssh-authorized-keys-mode  nil "SSH[authorized_keys]"
   "Major mode for ssh authorized_keys files."
-  (interactive)
-  (kill-all-local-variables)
-  (setq major-mode 'ssh-known-hosts-mode
-        mode-name "SSH[authorized_keys]")
+
+  ;; Font locking control
+  (setq-local font-lock-defaults
+              '((ssh-authorized-keys-mode-font-lock-keywords)))
+
   (set-syntax-table ssh-authorized-keys-mode-syntax-table)
   (setq comment-start "#"
         comment-end "")
-  (setq font-lock-defaults
-        '(ssh-authorized-keys-mode-font-lock-keywords nil t))
+
   (setq truncate-lines t)
   (ssh-abbreviated-keys-mode (if ssh-abbreviated-mode-default 1 -1))
   (run-hooks 'ssh-authorized-keys-mode-hook))
@@ -163,7 +165,7 @@ automatically."
 (defvar ssh-known-hosts-mode-hook nil
   "*Hook to setup `ssh-known-hosts-mode'.")
 
-(defvar ssh-known-hosts-mode-font-lock-keywords
+(defconst ssh-known-hosts-mode-font-lock-keywords
   (list
    `(,(regexp-opt '("@cert-authority") 'words) . font-lock-keyword-face)
    `(,(regexp-opt '("@revoked") 'words) . font-lock-warning-face)
@@ -194,16 +196,15 @@ automatically."
   "Syntax table used by `ssh-known-hosts-mode'.")
 
 ;;;###autoload
-(defun ssh-known-hosts-mode ()
+(define-derived-mode ssh-known-hosts-mode nil "SSH[known_hosts]"
   "Major mode for ssh known_hosts files."
-  (interactive)
-  (kill-all-local-variables)
-  (setq major-mode 'ssh-known-hosts-mode
-        mode-name "SSH[known_hosts]")
+
+  ;; Font locking control
+  (setq-local font-lock-defaults '((ssh-known-hosts-mode-font-lock-keywords)))
+
   (set-syntax-table ssh-known-hosts-mode-syntax-table)
   (setq comment-start "#"
         comment-end "")
-  (setq font-lock-defaults '(ssh-known-hosts-mode-font-lock-keywords))
   (setq truncate-lines t)
   (ssh-abbreviated-keys-mode (if ssh-abbreviated-mode-default 1 -1))
   (run-hooks 'ssh-known-hosts-mode-hook))
